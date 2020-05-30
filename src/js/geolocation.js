@@ -10,6 +10,12 @@ export function updatePosition() {
                     longitude: position.coords.longitude
                 }
             });
+        },
+        () => console.log("Error trying to retrieve location update."),
+        {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 5000
         }
     );
 }
