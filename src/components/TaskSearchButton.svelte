@@ -1,26 +1,57 @@
 <script>
-    import {updatePosition} from "../js/geolocation";
     import {onMount} from 'svelte';
     import {state} from "../js/state";
 
     let searchButtonActive = false;
     let helpTextActive = true;
+    let currentLatitude;
+    let currentLongitude;
+    let gamePin;
+
 
     state.subscribe(value => {
         searchButtonActive = !!value.game_pin;
         helpTextActive = value.help_active_search_button;
+        gamePin = value.game_pin;
+        currentLatitude = value.latitude;
+        currentLongitude = value.longitude;
     })
 
-    let searchForTask = () => {
-        updatePosition();
+    let searchForTask = async () => {
+        let taskInfo;
+        try {
+            taskInfo = await fetchTaskInfo();
+            console.log("Found task content id: " + taskInfo.task_content_id);
+        } catch (e) {
+            taskInfo = undefined;
+            console.log("No task content id found.");
+        }
         state.update(value => {
             return {
                 ...value,
                 help_active_search_button: false,
+                task_content_active: true,
+                task_content_id: taskInfo ? taskInfo.task_content_id : undefined,
                 zoom: 15.0
             }
-        })
-        console.log("Searching for task");
+        });
+    }
+
+    let fetchTaskInfo = async () => {
+        const response = await fetch("BRUSE_API_BASE_PATH/task/request",
+                {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        gamepin: gamePin,
+                        lat: currentLatitude,
+                        lon: currentLongitude
+                    })
+                });
+        return response.json();
     }
 
     onMount(() => {

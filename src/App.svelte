@@ -1,23 +1,14 @@
 <script>
     import Map from "./components/Map.svelte";
-    import {state} from "./js/state";
     import LocationUpdateButton from "./components/LocationUpdateButton.svelte";
     import MenuButton from "./components/MenuButton.svelte";
     import Menu from "./components/Menu.svelte";
     import GameEntry from "./components/GameEntry.svelte";
     import GameConfig from "./components/GameConfig.svelte";
     import TaskSearchButton from "./components/TaskSearchButton.svelte";
+    import TaskContent from "./components/TaskContent.svelte";
 
-
-    let obj;
-
-    state.subscribe(value => obj = value);
-
-    let check = function () {
-        console.log(obj);
-        setTimeout(check, 1000);
-    }
-    //check();
+    document.title = "bruse.app";
 
 </script>
 
@@ -51,4 +42,5 @@
     <Menu/>
     <GameEntry/>
     <GameConfig/>
+    <TaskContent/>
 </main>

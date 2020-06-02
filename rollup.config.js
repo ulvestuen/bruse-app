@@ -7,6 +7,7 @@ import {terser} from 'rollup-plugin-terser';
 
 const production = !process.env.ROLLUP_WATCH;
 const mapboxAccessToken = process.env.MAPBOX_ACCESS_TOKEN;
+const bruseApiBasePath = process.env.BRUSE_API_BASE_PATH;
 
 export default {
     input: 'src/main.js',
@@ -38,7 +39,8 @@ export default {
         }),
         commonjs(),
         replace({
-            MAPBOX_ACCESS_TOKEN: mapboxAccessToken
+            MAPBOX_ACCESS_TOKEN: mapboxAccessToken,
+            BRUSE_API_BASE_PATH: bruseApiBasePath
         }),
 
         // In dev mode, call `npm run start` once

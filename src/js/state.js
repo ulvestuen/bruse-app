@@ -8,5 +8,7 @@ export const state = writable({
     help_active_location_button: true,
     help_active_search_button: true,
     menu_active: false,
+    task_content_active: false,
+    task_content_id: undefined,
     zoom: 15.0
 });
