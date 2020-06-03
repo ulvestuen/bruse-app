@@ -24,7 +24,7 @@
             console.log("Found task content id: " + taskInfo.task_content_id);
         } catch (e) {
             taskInfo = undefined;
-            console.log("No task content id found.");
+            console.error("No task content id found.");
         }
         state.update(value => {
             return {

@@ -21,7 +21,6 @@
             }
         })
         updatePosition();
-
     }
 
     onMount(() => {
