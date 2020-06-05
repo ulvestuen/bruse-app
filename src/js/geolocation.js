@@ -1,31 +1,33 @@
 import {state} from "./state";
 
-export function updatePosition() {
-    findPosition(0);
-}
+let successCallback = (position) => {
+    state.update(value => {
+        return {
+            ...value,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        }
+    });
+};
 
-function findPosition(counter) {
-    const MAX_ATTEMPTS = 3;
+let errorCallback = (e) => console.error("Error trying to retrieve location update.");
+
+function findPosition() {
     navigator.geolocation.getCurrentPosition(
-        (position) => {
-            state.update(value => {
-                return {
-                    ...value,
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
-                }
-            });
-            if (position.coords.accuracy > 50 && counter < MAX_ATTEMPTS) {
-                console.log("Poor location accuracy in attempt " +
-                    (counter + 1) + " of " + MAX_ATTEMPTS)
-                findPosition(++counter);
-            }
-        },
-        () => console.error("Error trying to retrieve location update."),
+        successCallback,
+        errorCallback,
         {
             enableHighAccuracy: true,
             timeout: 5000,
             maximumAge: 0
         }
     );
+}
+
+export function updatePosition() {
+    const WATCH_TIME_MS = 10000;
+    const WATCH_PERIOD_MS = 1000;
+    const timerId = setInterval(findPosition, WATCH_PERIOD_MS);
+    setTimeout(() => clearInterval(timerId), WATCH_TIME_MS);
+
 }
