@@ -67,7 +67,7 @@
 
     .task {
         position: absolute;
-        top: 160px;
+        top: 128px;
         left: 24px;
         right: 24px;
         display: flex;
@@ -118,7 +118,8 @@
         {#if taskContentId}
             <div class="task-item" use:fetchTaskContent>
                 {#if taskContentType === TaskTypes.image}
-                    <img src={taskContentBlobUrl}>
+                    <img src={taskContentBlobUrl}
+                         alt="Task content">
                 {:else if taskContentType === TaskTypes.html}
                     {@html taskContentHtml}
                 {/if}

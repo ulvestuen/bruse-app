@@ -15,7 +15,7 @@
     })
 
     onMount(() => {
-        marker = new mapboxgl.Marker(container)
+        marker = new mapboxgl.Marker({element: container})
                 .setLngLat([25.783729, 71.170946])
                 .addTo(map);
     });
@@ -25,12 +25,12 @@
 <style>
     .marker {
         background-color: darkorange;
-        height: 2vw;
-        width: 2vw;
+        height: 3vw;
+        width: 3vw;
         border-color: gold;
         border-radius: 50%;
         border-style: solid;
-        border-width: 0.5vw;
+        border-width: 1vw;
     }
 </style>
 

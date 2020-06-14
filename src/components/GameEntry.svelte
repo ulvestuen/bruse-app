@@ -34,6 +34,12 @@
     };
 
     onMount(() => {
+
+        const queryParameters = window.location.search.substring(1).split("=");
+        gamePin = queryParameters[0] === "gamepin" && !isNaN(Number.parseInt(queryParameters[1]))
+                ? Number.parseInt(queryParameters[1])
+                : undefined;
+
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
