@@ -119,6 +119,7 @@
             <div class="task-item" use:fetchTaskContent>
                 {#if taskContentType === TaskTypes.image}
                     <img src={taskContentBlobUrl}
+                         on:load="{() => URL.revokeObjectURL(taskContentBlobUrl)}"
                          alt="Task content">
                 {:else if taskContentType === TaskTypes.html}
                     {@html taskContentHtml}
