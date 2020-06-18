@@ -5,7 +5,9 @@
 
     const TaskTypes = Object.freeze({
         image: 1,
-        html: 2
+        video: 2,
+        audio: 3,
+        html: 4
     });
 
     let taskContentActive = false;
@@ -38,7 +40,7 @@
     let fetchTaskContent = async () => {
         const response = await fetch("BRUSE_API_BASE_PATH/task/content/" + taskContentId);
         taskContentType = findTaskType(response.headers.get("Content-Type"));
-        if (taskContentType === TaskTypes.image) {
+        if ([TaskTypes.image, TaskTypes.audio, TaskTypes.video].includes(taskContentType)) {
             const content = await response.blob();
             taskContentBlobUrl = (window.URL ? URL : webkitURL).createObjectURL(content);
         } else if (taskContentType === TaskTypes.html) {
@@ -49,6 +51,10 @@
     function findTaskType(taskContentMimeType) {
         if (taskContentMimeType.startsWith("image/")) {
             return TaskTypes.image;
+        } else if (taskContentMimeType.startsWith("audio/")) {
+            return TaskTypes.audio;
+        } else if (taskContentMimeType.startsWith("video/")) {
+            return TaskTypes.video;
         } else if (taskContentMimeType.startsWith("text/html")) {
             return TaskTypes.html;
         }
@@ -98,11 +104,6 @@
         align-self: flex-end;
     }
 
-    :global(img) {
-        width: 100%;
-        height: auto;
-    }
-
     @keyframes rotateZ {
         0% {
             transform: rotateZ(-4deg);
@@ -121,6 +122,11 @@
                     <img src={taskContentBlobUrl}
                          on:load="{() => URL.revokeObjectURL(taskContentBlobUrl)}"
                          alt="Task content">
+                {:else if taskContentType === TaskTypes.video}
+                    <video controls
+                           src={taskContentBlobUrl}
+                           on:load="{() => URL.revokeObjectURL(taskContentBlobUrl)}"
+                           alt="Task content"></video>
                 {:else if taskContentType === TaskTypes.html}
                     {@html taskContentHtml}
                 {/if}
