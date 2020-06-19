@@ -2,21 +2,10 @@
     import {onMount} from 'svelte';
     import {state} from "../js/state";
     import DOMPurify from 'dompurify';
-
-    const TaskTypes = Object.freeze({
-        image: 1,
-        video: 2,
-        audio: 3,
-        html: 4
-    });
+    import {TaskTypes, findTaskType} from '../js/task_content'
 
     let taskContentActive = false;
     let taskContentId;
-
-    let taskContentType;
-    let taskContentBlobUrl;
-    let taskContentHtml;
-
 
     state.subscribe(value => {
         taskContentActive = value.task_content_active;
@@ -25,10 +14,6 @@
 
 
     let closeTask = () => {
-        taskContentType = undefined;
-        taskContentBlobUrl = undefined;
-        taskContentHtml = undefined;
-
         state.update(value => {
             return {
                 ...value,
@@ -37,36 +22,31 @@
         })
     };
 
-    let fetchTaskContent = async () => {
-        const response = await fetch("BRUSE_API_BASE_PATH/task/content/" + taskContentId);
-        taskContentType = findTaskType(response.headers.get("Content-Type"));
-        if ([TaskTypes.image, TaskTypes.audio, TaskTypes.video].includes(taskContentType)) {
-            const content = await response.blob();
-            taskContentBlobUrl = (window.URL ? URL : webkitURL).createObjectURL(content);
-        } else if (taskContentType === TaskTypes.html) {
-            taskContentHtml = DOMPurify.sanitize(await response.text());
-        }
-    };
-
-    function findTaskType(taskContentMimeType) {
-        if (taskContentMimeType.startsWith("image/")) {
-            return TaskTypes.image;
-        } else if (taskContentMimeType.startsWith("audio/")) {
-            return TaskTypes.audio;
-        } else if (taskContentMimeType.startsWith("video/")) {
-            return TaskTypes.video;
-        } else if (taskContentMimeType.startsWith("text/html")) {
-            return TaskTypes.html;
-        }
-    }
-
     onMount(async () => {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
         document.head.appendChild(link);
         return () => link.parentNode.removeChild(link);
-    })
+    });
+
+    async function fetchTaskContent(taskContentId) {
+        const taskContentUrl = "BRUSE_API_BASE_PATH/task/content/" + taskContentId;
+        const taskType = await findTaskType(taskContentUrl);
+        let taskContentHtml;
+        if (taskType.taskType === TaskTypes.html) {
+            if (taskType.taskType === TaskTypes.html) {
+                const responseHtml = await fetch(taskContentUrl);
+                taskContentHtml = DOMPurify.sanitize(await responseHtml.text());
+            }
+        }
+        return {
+            taskContentUrl,
+            taskType: taskType.taskType,
+            taskMimeType: taskType.mimeType,
+            taskContentHtml
+        };
+    }
 </script>
 
 <style>
@@ -117,19 +97,24 @@
 {#if taskContentActive}
     <div class="task">
         {#if taskContentId}
-            <div class="task-item" use:fetchTaskContent>
-                {#if taskContentType === TaskTypes.image}
-                    <img src={taskContentBlobUrl}
-                         on:load="{() => URL.revokeObjectURL(taskContentBlobUrl)}"
-                         alt="Task content">
-                {:else if taskContentType === TaskTypes.video}
-                    <video controls
-                           src={taskContentBlobUrl}
-                           on:load="{() => URL.revokeObjectURL(taskContentBlobUrl)}"
-                           alt="Task content"></video>
-                {:else if taskContentType === TaskTypes.html}
-                    {@html taskContentHtml}
-                {/if}
+            <div class="task-item">
+                {#await fetchTaskContent(taskContentId)}
+                    Loading...
+                {:then value}
+                    {#if value.taskType === TaskTypes.image}
+                        <img src={value.taskContentUrl}
+                             alt="Task image content">
+                    {:else if value.taskType === TaskTypes.video}
+                        <video controls
+                               preload="auto">
+                            <source src={value.taskContentUrl}
+                                    type={value.taskMimeType}>
+                            Task video content
+                        </video>
+                    {:else if value.taskType === TaskTypes.html}
+                        {@html value.taskContentHtml}
+                    {/if}
+                {/await}
             </div>
         {:else}
             <div class="task-item">
