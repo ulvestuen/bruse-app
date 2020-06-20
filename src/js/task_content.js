@@ -7,7 +7,6 @@ export const TaskTypes = Object.freeze({
 
 
 export async function findTaskType(contentUrl) {
-    console.log("findTaskType")
     const response = await fetch(contentUrl, {
         method: "HEAD"
     });

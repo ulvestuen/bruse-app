@@ -17,7 +17,8 @@
         state.update(value => {
             return {
                 ...value,
-                task_content_active: false
+                task_content_active: false,
+                task_content_id: undefined
             };
         })
     };
@@ -114,6 +115,8 @@
                     {:else if value.taskType === TaskTypes.html}
                         {@html value.taskContentHtml}
                     {/if}
+                {:catch e}
+                    An error occurred while fetching task content.
                 {/await}
             </div>
         {:else}
