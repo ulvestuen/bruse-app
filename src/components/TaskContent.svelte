@@ -116,7 +116,8 @@
                         {@html value.taskContentHtml}
                     {/if}
                 {:catch e}
-                    An error occurred while fetching task content.
+                    An error occurred while fetching task content:<br/>
+                    {e}
                 {/await}
             </div>
         {:else}
