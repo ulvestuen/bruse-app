@@ -8,57 +8,46 @@ export const TaskTypes = Object.freeze({
 });
 
 export async function fetchTaskContent(taskContentId) {
-    const taskContentUrl = "BRUSE_API_BASE_PATH/task/content/" + taskContentId;
-    const taskType = await findTaskType(taskContentUrl);
-    let taskContentHtml;
-    if (taskType.taskType === TaskTypes.html) {
-        const responseHtml = await fetch(taskContentUrl);
-        taskContentHtml = await responseHtml.text();
-    }
-    if (taskType.taskType === TaskTypes.image) {
-        taskContentHtml = `<img src="${taskContentUrl}"
-                                alt="Task image content">`
-    }
-    if (taskType.taskType === TaskTypes.video) {
-        taskContentHtml = `<video controls
+    const response = await fetch("BRUSE_API_BASE_PATH/task/content/info/" + taskContentId);
+    if (response.ok) {
+        const taskContentInfo = await response.json();
+        const taskType = findTaskType(taskContentInfo.task_content_type);
+        let taskContentHtml;
+        if (taskType === TaskTypes.html) {
+            const responseHtml = await fetch(taskContentInfo.task_content_url);
+            taskContentHtml = await responseHtml.text();
+        }
+        if (taskType === TaskTypes.image) {
+            taskContentHtml = `<img src="${taskContentInfo.task_content_url}"
+                                    alt="Task image content">`
+        }
+        if (taskType === TaskTypes.video) {
+            taskContentHtml = `<video controls
                                   preload="auto">
-                               <source src="${taskContentUrl}"
-                                    type="${taskType.mimeType}">
+                               <source src="${taskContentInfo.task_content_url}"
+                                       type="${taskContentInfo.task_content_type}">
                                Task video content.
                            </video>`;
+        }
+        return {
+            taskContentUrl: taskContentInfo.task_content_url,
+            taskType,
+            taskMimeType: taskContentInfo.task_content_type,
+            taskContentHtml: DOMPurify.sanitize(taskContentHtml)
+        };
+    } else {
+        throw new Error("Unexpected response code from server when fetching task content info.");
     }
-    return {
-        taskContentUrl,
-        taskType: taskType.taskType,
-        taskMimeType: taskType.mimeType,
-        taskContentHtml: DOMPurify.sanitize(taskContentHtml)
-    };
 }
 
-async function findTaskType(contentUrl) {
-    const response = await fetch(contentUrl, {
-        method: "HEAD"
-    });
-    const mimeType = response.headers.get("Content-Type");
-    if (mimeType.startsWith("image/")) {
-        return {
-            mimeType: mimeType,
-            taskType: TaskTypes.image
-        };
-    } else if (mimeType.startsWith("video/")) {
-        return {
-            mimeType: mimeType,
-            taskType: TaskTypes.video
-        };
-    } else if (mimeType.startsWith("audio/")) {
-        return {
-            mimeType: mimeType,
-            taskType: TaskTypes.audio
-        };
-    } else if (mimeType.startsWith("text/html")) {
-        return {
-            mimeType: mimeType,
-            taskType: TaskTypes.html
-        };
+function findTaskType(contentType) {
+    if (contentType.startsWith("image/")) {
+        return TaskTypes.image;
+    } else if (contentType.startsWith("video/")) {
+        return TaskTypes.video;
+    } else if (contentType.startsWith("audio/")) {
+        return TaskTypes.audio;
+    } else if (contentType.startsWith("text/html")) {
+        return TaskTypes.html;
     }
 }
