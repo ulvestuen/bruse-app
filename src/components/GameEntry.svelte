@@ -1,7 +1,7 @@
 <script>
     import {onMount} from 'svelte';
     import {state} from "../js/state";
-    import {updatePosition} from "../js/geolocation";
+    import {watchPosition} from "../js/geolocation";
 
     let gamePin;
 
@@ -30,7 +30,7 @@
                 help_active_search_button: true
             }
         });
-        updatePosition();
+        watchPosition();
     };
 
     onMount(() => {

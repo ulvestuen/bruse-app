@@ -1,5 +1,5 @@
 <script>
-    import {updatePosition} from "../js/geolocation";
+    import {watchPosition} from "../js/geolocation";
     import {onMount} from 'svelte';
     import {state} from "../js/state";
 
@@ -20,7 +20,7 @@
                 zoom: 15.0
             }
         })
-        updatePosition();
+        watchPosition();
     }
 
     onMount(() => {
