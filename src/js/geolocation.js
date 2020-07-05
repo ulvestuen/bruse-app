@@ -12,19 +12,7 @@ let successCallback = (position) => {
 
 let errorCallback = (e) => console.error("Error trying to retrieve location update.");
 
-function findPosition() {
-    navigator.geolocation.getCurrentPosition(
-        successCallback,
-        errorCallback,
-        {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-        }
-    );
-}
-
-function findPositionContinuous() {
+function createGeolocationWatcher() {
     return navigator.geolocation.watchPosition(
         successCallback,
         errorCallback,
@@ -36,17 +24,8 @@ function findPositionContinuous() {
     );
 }
 
-export function updatePosition() {
-    const WATCH_TIME_MS = 10000;
-    const WATCH_PERIOD_MS = 1000;
-    const timerId = setInterval(findPosition, WATCH_PERIOD_MS);
-    setTimeout(() => clearInterval(timerId), WATCH_TIME_MS);
-
-}
-
 export function watchPosition() {
     const WATCH_TIME_MS = 20000;
-    const watchId = findPositionContinuous();
+    const watchId = createGeolocationWatcher();
     setTimeout(() => navigator.geolocation.clearWatch(watchId), WATCH_TIME_MS);
-
 }
