@@ -7,6 +7,8 @@
     import GameConfig from "./components/GameConfig.svelte";
     import TaskSearchButton from "./components/TaskSearchButton.svelte";
     import TaskContent from "./components/TaskContent.svelte";
+    import '@pwabuilder/pwaupdate';
+    import '@pwabuilder/pwainstall';
 
     document.title = "bruse.app";
 
@@ -43,4 +45,5 @@
     <GameEntry/>
     <GameConfig/>
     <TaskContent/>
+    <pwa-update/>
 </main>
