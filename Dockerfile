@@ -33,6 +33,9 @@
 # a dual license of either "Apache License Version 2.0" or "Mozilla Public License Version 2.".
 # For details, see https://github.com/cure53/DOMPurify/blob/master/LICENSE
 
+# When docker image is built from this file, the image bundles a version of @pwabuilder/pwaupdate, which is available under
+# a "MIT" license. For details, see https://github.com/pwa-builder/pwa-update/blob/master/LICENSE.txt
+
 FROM node:slim
 
 RUN groupadd -g 999 bruse-app && \
