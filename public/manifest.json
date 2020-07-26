@@ -14,9 +14,14 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "favicon.png",
+      "src": "assets/bruse192.png",
       "type": "image/png",
       "sizes": "192x192"
+    },
+    {
+      "src": "assets/bruse512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
   "url": "https://bruse.app",
